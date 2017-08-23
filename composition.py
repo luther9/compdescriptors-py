@@ -2,7 +2,8 @@ __all__ = 'Interface', 'final', 'InheritanceError'
 
 
 class InheritanceError(Exception):
-    pass
+    """Raised when a new class attempts to inherit from an illegal base class.
+    """
 
 
 def _init_subclass(cls):
@@ -11,20 +12,21 @@ def _init_subclass(cls):
 
 
 def final(cls):
-    cls.__init_subclass__ = _init_subclass
+    cls.__init_subclass__ = classmethod(_init_subclass)
     return cls
 
 
-def _new_property(cls, attr):
+class _Descriptor:
 
-    def get(self):
+    def __init__(self, attr):
+        self.attr = attr
+
+    def __get__(self, instance, owner):
         try:
-            return self.__getattr__(attr)
+            return instance.__getattr__(self.attr)
         except AttributeError:
             raise NotImplementedError(
-                f"{cls.__name__} must define attribute {attr}.")
-
-    return property(get)
+                f"{owner.__name__} must define attribute {self.attr}.")
 
 
 class Interface:
@@ -46,7 +48,9 @@ class Interface:
 
     def __call__(self, cls):
         for attr in self._attributes:
-            cls.__dict__.setdefault(_new_property(cls, attr))
+            if attr not in cls.__dict__:
+                setattr(cls, attr, _Descriptor(attr))
+        return cls
 
     def validate(self, o):
         """Check if object o has all the attributes of the Interface."""
