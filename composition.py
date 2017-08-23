@@ -6,12 +6,12 @@ class InheritanceError(Exception):
     """
 
 
-def _init_subclass(cls):
-    raise InheritanceError(
-        f'{cls.__name__} is concrete. It cannot be subclassed.')
-
-
 def final(cls):
+
+    def _init_subclass(bad_class):
+        raise InheritanceError(
+            f'Class {cls.__name__} is concrete. It cannot be subclassed.')
+
     cls.__init_subclass__ = classmethod(_init_subclass)
     return cls
 
@@ -26,7 +26,8 @@ class _Descriptor:
             return instance.__getattr__(self.attr)
         except AttributeError:
             raise NotImplementedError(
-                f"{owner.__name__} must define attribute {self.attr}.")
+                f'Class {type(instance).__name__} must define attribute'
+                ' {self.attr}.') from None
 
 
 class Interface:
