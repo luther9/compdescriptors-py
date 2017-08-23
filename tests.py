@@ -5,6 +5,17 @@ import unittest
 from composition import Interface, final, InheritanceError
 
 
+def _for_all_classes(f):
+    """A decorator that runs the test for every class defined in
+    InterfaceTest.setup.
+    """
+    def test(self):
+        for cls in self.implementors:
+            with self.subTest(cls=cls):
+                f(self, cls)
+    return test
+
+
 class InterfaceTest(unittest.TestCase):
     """This fixture tests getting attributes from different kinds of classes."""
 
@@ -27,36 +38,29 @@ class InterfaceTest(unittest.TestCase):
                     return True
                 raise AttributeError
 
-        self.contexts = (
-            (cls, self.subTest(cls=cls)) for cls
-            in (ClassAttrs, InstanceAttrs, Getattr))
+        self.implementors = ClassAttrs, InstanceAttrs, Getattr
 
-    def test_required_defined(self):
+    @_for_all_classes
+    def test_required_defined(self, cls):
         """Get an attribute that is required by the interface and defined by the
         class.
         """
-        for cls, context in self.contexts:
-            with context:
-                self.assertIs(cls().foo, True)
+        self.assertIs(cls().foo, True)
 
-    def test_defined(self):
+    @_for_all_classes
+    def test_defined(self, cls):
         """Get a defined, non-required attribute."""
-        for cls, context in self.contexts:
-            with context:
-                self.assertIs(cls().bar, True)
+        self.assertIs(cls().bar, True)
 
-    def test_NotImplementedError(self):
+    @_for_all_classes
+    def test_NotImplementedError(self, cls):
         """Raise an exception for a required, undefined attribute."""
-        for cls, context in self.contexts:
-            with context:
-                self.assertRaises(NotImplementedError, getattr, cls(), 'baz')
+        self.assertRaises(NotImplementedError, getattr, cls(), 'baz')
 
-    def test_AttributeError(self):
+    @_for_all_classes
+    def test_AttributeError(self, cls):
         """Raise an exception for an attribute that nobody defined."""
-        for cls, context in self.contexts:
-            with context:
-                self.assertRaises(
-                    AttributeError, getattr, cls(), 'yagami_raito')
+        self.assertRaises(AttributeError, getattr, cls(), 'yagami_raito')
 
 
 class TestValidate(unittest.TestCase):
