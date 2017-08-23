@@ -1,3 +1,5 @@
+#!/usr/bin/python3.6
+
 import unittest
 
 from composition import Interface, final, InheritanceError
@@ -52,6 +54,38 @@ class InterfaceTest(unittest.TestCase):
             with self.subTest(cls=cls):
                 self.assertRaises(
                     AttributeError, getattr, cls(), 'yagami_raito')
+
+
+class TestValidate(unittest.TestCase):
+
+    def setUp(self):
+        self.Fooer = Interface('foo')
+        self.validate = self.Fooer.validate
+
+    def test_true(self):
+        """Return True for an object that implements the interface, even if it's
+        not declared as such.
+        """
+        class C:
+            foo = None
+        self.assertTrue(self.validate(C()))
+
+    def test_false(self):
+        """Return False for an unregistered object which doesn't implement the
+        interface.
+        """
+        class C:
+            pass
+        self.assertFalse(self.validate(C()))
+
+    def test_NotImplementedError(self):
+        """If implementor is registered, but fails to implement the interface,
+        this is a bug in the implementor.
+        """
+        @self.Fooer
+        class C:
+            pass
+        self.assertRaises(NotImplementedError, self.validate, C())
 
 
 class FinalTest(unittest.TestCase):

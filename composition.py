@@ -54,10 +54,10 @@ class Interface:
         return cls
 
     def validate(self, o):
-        """Check if object o has all the attributes of the Interface."""
-        for attr in self._attributes:
-            try:
-                getattr(o, attr)
-            except (AttributeError, NotImplementedError):
-                return False
-        return True
+        """Check if object o has all the attributes of the Interface.
+
+        If o's class was declared with this interface and it does not define all
+        required attributes, consider this a bug in the class, and throw
+        NotImplementedError.
+        """
+        return all(hasattr(o, attr) for attr in self._attributes)
