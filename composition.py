@@ -26,8 +26,8 @@ class _Descriptor:
             return instance.__getattr__(self.attr)
         except AttributeError:
             raise NotImplementedError(
-                f'Class {type(instance).__name__} must define attribute'
-                ' {self.attr}.') from None
+                f'Class {owner.__name__} must define attribute {self.attr}.'
+            ) from None
 
 
 class Interface:
