@@ -5,17 +5,6 @@ import unittest
 from composition import Interface, final, InheritanceError
 
 
-def _for_all_classes(f):
-    """A decorator that runs the test for every class defined in
-    InterfaceTest.setup.
-    """
-    def test(self):
-        for cls in self.implementors:
-            with self.subTest(cls=cls):
-                f(self, cls)
-    return test
-
-
 class InterfaceTest(unittest.TestCase):
     """This fixture tests getting attributes from different kinds of classes."""
 
@@ -39,6 +28,14 @@ class InterfaceTest(unittest.TestCase):
                 raise AttributeError
 
         self.implementors = ClassAttrs, InstanceAttrs, Getattr
+
+    def _for_all_classes(f):
+        """A decorator that runs the test for every class defined in setUp."""
+        def test(self):
+            for cls in self.implementors:
+                with self.subTest(cls=cls):
+                    f(self, cls)
+        return test
 
     @_for_all_classes
     def test_required_defined(self, cls):
