@@ -6,6 +6,7 @@ from composition import Interface, final, InheritanceError
 
 
 class InterfaceTest(unittest.TestCase):
+    """This fixture tests getting attributes from different kinds of classes."""
 
     def setUp(self):
         FooBazer = Interface('foo', 'baz')
@@ -26,32 +27,34 @@ class InterfaceTest(unittest.TestCase):
                     return True
                 raise AttributeError
 
-        self.implementors = (ClassAttrs, InstanceAttrs, Getattr)
+        self.contexts = (
+            (cls, self.subTest(cls=cls)) for cls
+            in (ClassAttrs, InstanceAttrs, Getattr))
 
     def test_required_defined(self):
         """Get an attribute that is required by the interface and defined by the
         class.
         """
-        for cls in self.implementors:
-            with self.subTest(cls=cls):
+        for cls, context in self.contexts:
+            with context:
                 self.assertIs(cls().foo, True)
 
     def test_defined(self):
         """Get a defined, non-required attribute."""
-        for cls in self.implementors:
-            with self.subTest(cls=cls):
+        for cls, context in self.contexts:
+            with context:
                 self.assertIs(cls().bar, True)
 
     def test_NotImplementedError(self):
         """Raise an exception for a required, undefined attribute."""
-        for cls in self.implementors:
-            with self.subTest(cls=cls):
+        for cls, context in self.contexts:
+            with context:
                 self.assertRaises(NotImplementedError, getattr, cls(), 'baz')
 
     def test_AttributeError(self):
         """Raise an exception for an attribute that nobody defined."""
-        for cls in self.implementors:
-            with self.subTest(cls=cls):
+        for cls, context in self.contexts:
+            with context:
                 self.assertRaises(
                     AttributeError, getattr, cls(), 'yagami_raito')
 
