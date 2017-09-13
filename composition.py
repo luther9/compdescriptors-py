@@ -1,4 +1,25 @@
-__all__ = 'Interface', 'final', 'InheritanceError'
+__all__ = 'Delegate', 'Interface', 'final', 'InheritanceError'
+
+
+class Delegate:
+    """A data descriptor that delegates attribute access to a field in the
+    instance.
+    """
+
+    def __init__(self, field):
+        self.field = field
+
+    def __set_name__(self, owner, name):
+        self.name = name
+
+    def __get__(self, instance, owner):
+        return getattr(getattr(instance, self.field), self.name)
+
+    def __set__(self, instance, value):
+        setattr(getattr(instance, self.field), self.name, value)
+
+    def __delete__(self, instance):
+        delattr(getattr(instance, self.field), self.name)
 
 
 class InheritanceError(Exception):

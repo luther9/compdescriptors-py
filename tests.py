@@ -2,7 +2,42 @@
 
 import unittest
 
-from composition import Interface, final, InheritanceError
+from composition import Delegate, Interface, final, InheritanceError
+
+
+class DelegateTest(unittest.TestCase):
+    """Test the delegation function."""
+
+    def setUp(self):
+
+        class Thing:
+            def __init__(self):
+                self.var = 'hello'
+            def __len__(self):
+                return 42
+
+        class C:
+            var = Delegate('thing')
+            __len__ = Delegate('thing')
+            def __init__(self):
+                self.thing = Thing()
+
+        self.o = C()
+
+    def test_delegate(self):
+        self.assertEqual(self.o.var, 'hello')
+
+    def test_delegate_set(self):
+        self.o.var = 84
+        self.assertEqual(self.o.thing.var, 84)
+
+    def test_delegate_del(self):
+        del self.o.var
+        self.assertFalse(hasattr(self.o, 'var'))
+        self.assertFalse(hasattr(self.o.thing, 'var'))
+
+    def test_delegate_special(self):
+        self.assertEqual(len(self.o), 42)
 
 
 class InterfaceTest(unittest.TestCase):
