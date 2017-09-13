@@ -1,5 +1,8 @@
 #!/usr/bin/python3.6
 
+# 2017 Luther Thompson
+# This code is public domain under CC0. See the file COPYING for details.
+
 import unittest
 
 from composition import Delegate, Interface, final, InheritanceError

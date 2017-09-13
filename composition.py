@@ -1,3 +1,6 @@
+# 2017 Luther Thompson
+# This code is public domain under CC0. See the file COPYING for details.
+
 __all__ = 'Delegate', 'Interface', 'final', 'InheritanceError'
 
 
