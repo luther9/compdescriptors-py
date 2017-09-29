@@ -38,6 +38,10 @@ class C:
 Due to the duck-typing nature of Python, the following tools are not strictly
 necessary. They are provided to help enforce project requirements on classes.
 
+### `compdescriptors.**final**`(cls)
+
+A class decorator that prevents other classes from inheriting from *cls*.
+
 ### class `compdescriptors.**InheritanceError**`
 
 Raised when a class attempts to inherit from a class that has been declared

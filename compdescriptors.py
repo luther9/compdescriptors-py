@@ -26,11 +26,14 @@ class Delegate:
 
 
 class InheritanceError(Exception):
-    """Raised when a new class attempts to inherit from an illegal base class.
+    """Raised when a class attempts to inherit from a class that has been
+    declared @final.
     """
 
 
 def final(cls):
+    """A class decorator that prevents other classes from inheriting from *cls*.
+    """
 
     def _init_subclass(bad_class):
         raise InheritanceError(
