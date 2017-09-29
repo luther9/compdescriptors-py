@@ -5,7 +5,8 @@
 
 import unittest
 
-from composition import Delegate, Interface, final, InheritanceError
+from compdescriptors import (
+    Delegate, Abstract, Interface, final, InheritanceError)
 
 
 class DelegateTest(unittest.TestCase):
@@ -41,6 +42,25 @@ class DelegateTest(unittest.TestCase):
 
     def test_delegate_special(self):
         self.assertEqual(len(self.o), 42)
+
+
+class AbstractTest(unittest.TestCase):
+    """Test the Abstract descriptor."""
+
+    def setUp(self):
+        class A:
+            var = Abstract()
+        self.A = A
+
+    def test_same(self):
+        """Works within a single class."""
+        self.assertRaises(NotImplementedError, getattr, self.A(), 'var')
+
+    def test_subclass(self):
+        """Works with an inherited descriptor."""
+        class B(self.A):
+            pass
+        self.assertRaises(NotImplementedError, getattr, B(), 'var')
 
 
 class InterfaceTest(unittest.TestCase):

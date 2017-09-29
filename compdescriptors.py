@@ -1,7 +1,7 @@
 # 2017 Luther Thompson
 # This code is public domain under CC0. See the file COPYING for details.
 
-__all__ = 'Delegate', 'Interface', 'final', 'InheritanceError'
+__all__ = 'Delegate', 'Abstract', 'Interface', 'final', 'InheritanceError'
 
 
 class Delegate:
@@ -12,10 +12,10 @@ class Delegate:
     def __init__(self, field):
         self.field = field
 
-    def __set_name__(self, owner, name):
+    def __set_name__(self, _, name):
         self.name = name
 
-    def __get__(self, instance, owner):
+    def __get__(self, instance, _):
         return getattr(getattr(instance, self.field), self.name)
 
     def __set__(self, instance, value):
@@ -43,18 +43,31 @@ def final(cls):
     return cls
 
 
-class _Descriptor:
+class Abstract:
+    """Use this non-data descriptor to define an abstract attribute. If a class
+    includes this descriptor, yet does not provide the attribute (whether by
+    __init__, or __getattr__, or whatever), then instead of AttributeError,
+    it will raise NotImplementedError with the message saying it's the class's
+    fault.
+    """
 
-    def __init__(self, attr):
-        self.attr = attr
+    def __set_name__(self, owner, name):
+        self._owner = owner
+        self._name = name
 
     def __get__(self, instance, owner):
+        name = self._name
         try:
-            return instance.__getattr__(self.attr)
+            return instance.__getattr__(name)
         except AttributeError:
             pass
+        base = self._owner
+        owner_name = owner.__name__
         raise NotImplementedError(
-            f'Class {owner.__name__} must define attribute {self.attr}.')
+            f"Type {owner_name} promises to define attribute '{name}', but doesn't."
+            if owner is base
+            else
+            f"Class {base.__name__} requires type {owner_name} to define attribute '{name}'.")
 
 
 class Interface:
@@ -75,10 +88,14 @@ class Interface:
         self._attributes = tuple(attr_list)
 
     def __call__(self, cls):
-        for attr in self._attributes:
-            if attr not in cls.__dict__:
-                setattr(cls, attr, _Descriptor(attr))
-        return cls
+        """Return a modified version of cls with missing attributes filled in
+        with Abstract descriptors.
+        """
+        return type(
+            cls.__name__, cls.__bases__,
+            dict(
+                {name: Abstract() for name in self._attributes},
+                **cls.__dict__))
 
     def validate(self, o):
         """Check if object o has all the attributes of the Interface.

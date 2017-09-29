@@ -17,6 +17,8 @@ by *field*. All access, setting, and deletion of this attribute will apply to
 the instance field, not the instance itself. It can be used like this:
 
 ```python
+from compdescriptors import Delegate
+
 class Thing:
 
     def __init__(self):
@@ -41,6 +43,27 @@ necessary. They are provided to help enforce project requirements on classes.
 ### `compdescriptors.**final**`(cls)
 
 A class decorator that prevents other classes from inheriting from *cls*.
+
+### class `compdescriptors.**Abstract**`
+
+Use this non-data descriptor to define an abstract attribute. If a class
+includes this descriptor, yet does not provide the attribute (whether by
+`__init__`, or `__getattr__`, or whatever), then instead of AttributeError, it
+will raise NotImplementedError with the message saying it's the class's fault.
+
+This can be used to ensure that a class will throw an error if it forgets to
+define an instance attribute. It can also be used to define abstract classes.
+For example, this is how you could define an interface with class syntax. All
+subclasses would be required to define `foo` and `bar`:
+
+```python
+from compdescriptors import Abstract
+
+class FooBarer:
+    __slots__ = ()
+    foo = Abstract()
+    bar = Abstract()
+```
 
 ### class `compdescriptors.**InheritanceError**`
 
