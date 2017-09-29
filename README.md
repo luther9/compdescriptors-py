@@ -51,10 +51,11 @@ includes this descriptor, yet does not provide the attribute (whether by
 `__init__`, or `__getattr__`, or whatever), then instead of AttributeError, it
 will raise NotImplementedError with the message saying it's the class's fault.
 
-This can be used to ensure that a class will throw an error if it forgets to
-define an instance attribute. It can also be used to define abstract classes.
-For example, this is how you could define an interface with class syntax. All
-subclasses would be required to define `foo` and `bar`:
+Using this, `NotImplementedError` indicates a mistake in the class, while
+`AttributeError` is more likely to indicate a mistake in the client code. It can
+also be used to define abstract classes. For example, this is how you could
+define an interface with class syntax. All subclasses would be required to
+define `foo` and `bar`:
 
 ```python
 from compdescriptors import Abstract
