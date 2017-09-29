@@ -32,3 +32,13 @@ class C:
     def __init__(self):
         self.thing = Thing()
 ```
+
+## Validation
+
+Due to the duck-typing nature of Python, the following tools are not strictly
+necessary. They are provided to help enforce project requirements on classes.
+
+### class `compdescriptors.**InheritanceError**`
+
+Raised when a class attempts to inherit from a class that has been declared
+`@final`.
