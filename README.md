@@ -8,3 +8,27 @@ behavior, and changes in other classes do not force changes in that class's
 interface. For more information, see [this
 article](https://en.wikipedia.org/wiki/Composition_over_inheritance).
 
+## Delegation
+
+### class `compdescriptors.**Delegate**`(field)
+
+A data descriptor that delegates its attribute to the instance attribute given
+by *field*. All access, setting, and deletion of this attribute will apply to
+the instance field, not the instance itself. It can be used like this:
+
+```python
+class Thing:
+
+    def __init__(self):
+        self.var = 'hello'
+
+    def __len__(self):
+        return 42
+
+class C:
+    var = Delegate('thing')
+    __len__ = Delegate('thing')
+
+    def __init__(self):
+        self.thing = Thing()
+```
