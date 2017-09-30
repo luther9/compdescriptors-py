@@ -10,7 +10,7 @@ article](https://en.wikipedia.org/wiki/Composition_over_inheritance).
 
 ## Delegation
 
-### class `compdescriptors.**Delegate**`(field)
+### class `Delegate`(field)
 
 A data descriptor that delegates its attribute to the instance attribute given
 by *field*. All access, setting, and deletion of this attribute will apply to
@@ -40,11 +40,11 @@ class C:
 Due to the duck-typing nature of Python, the following tools are not strictly
 necessary. They are provided to help enforce project requirements on classes.
 
-### `compdescriptors.**final**`(cls)
+### `final`(cls)
 
 A class decorator that prevents other classes from inheriting from *cls*.
 
-### class `compdescriptors.**Abstract**`
+### class `Abstract`
 
 Use this non-data descriptor to define an abstract attribute. If a class
 includes this descriptor, yet does not provide the attribute (whether by
@@ -66,7 +66,7 @@ class FooBarer:
     bar = Abstract()
 ```
 
-### class `compdescriptors.**Interface**`(*attributes)
+### class `Interface`(*attributes)
 
 Return a class decorator that adds Abstract descriptors for the given attribute
 names. The arguments may be strings and/or other Interface objects. Example:
@@ -92,7 +92,7 @@ class A:
 
 Interface objects have a method:
 
-#### `**validate**`(obj)
+#### `validate`(obj)
 
 Return True if *obj* has all of the attributes that would be required by this
 Interface, otherwise False. This lets you check undecorated classes. Note that
@@ -101,7 +101,7 @@ it, this is a bug in the class. In that case, `validate` will raise NotImplement
 
 ## Exceptions
 
-### class `compdescriptors.**InheritanceError**`
+### class `InheritanceError`
 
 Raised when a class attempts to inherit from a class that has been declared
 `@final`.
