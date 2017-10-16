@@ -1,4 +1,4 @@
-#!/usr/bin/python3.6
+#!/usr/bin/python3
 
 # 2017 Luther Thompson
 # This code is public domain under CC0. See the file COPYING for details.
@@ -67,19 +67,16 @@ class InterfaceTest(unittest.TestCase):
     """This fixture tests getting attributes from different kinds of classes."""
 
     def setUp(self):
-        FooBazer = Interface('foo', 'baz')
+        FooBazer = Interface.new('Foobazer', 'foo', 'baz')
 
-        @FooBazer
-        class ClassAttrs:
+        class ClassAttrs(FooBazer):
             foo = bar = True
 
-        @FooBazer
-        class InstanceAttrs:
+        class InstanceAttrs(FooBazer):
             def __init__(self):
                 self.foo = self.bar = True
 
-        @FooBazer
-        class Getattr:
+        class Getattr(FooBazer):
             def __getattr__(self, attr):
                 if attr in ('foo', 'bar'):
                     return True
@@ -121,8 +118,7 @@ class InterfaceTest(unittest.TestCase):
 class TestValidate(unittest.TestCase):
 
     def setUp(self):
-        self.Fooer = Interface('foo')
-        self.validate = self.Fooer.validate
+        self.Fooer = Interface.new('Fooer', 'foo')
 
     def test_true(self):
         """Return True for an object that implements the interface, even if it's
@@ -130,7 +126,7 @@ class TestValidate(unittest.TestCase):
         """
         class C:
             foo = None
-        self.assertTrue(self.validate(C()))
+        self.assertTrue(isinstance(C(), self.Fooer))
 
     def test_false(self):
         """Return False for an unregistered object which doesn't implement the
@@ -138,16 +134,15 @@ class TestValidate(unittest.TestCase):
         """
         class C:
             pass
-        self.assertFalse(self.validate(C()))
+        self.assertFalse(isinstance(C(), self.Fooer))
 
     def test_NotImplementedError(self):
         """If implementor is registered, but fails to implement the interface,
         this is a bug in the implementor.
         """
-        @self.Fooer
-        class C:
+        class C(self.Fooer):
             pass
-        self.assertRaises(NotImplementedError, self.validate, C())
+        self.assertRaises(NotImplementedError, isinstance, C(), self.Fooer)
 
 
 class FinalTest(unittest.TestCase):

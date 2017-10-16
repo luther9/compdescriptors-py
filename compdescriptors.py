@@ -56,6 +56,8 @@ class Abstract:
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         name = self._name
         try:
             return instance.__getattr__(name)
@@ -70,38 +72,19 @@ class Abstract:
             f"Class {base.__name__} requires type {owner_name} to define attribute '{name}'.")
 
 
-class Interface:
-    """Arguments must be either strings or other Interface objects defining
-    which attributes an implementing class must define. Return a class
-    decorator.
+class Interface(type):
+    """A metaclass for inheritable interfaces.
+
+    Interfaces should define __slots__=() to differentiate from concrete
+    classes.
     """
 
-    def __init__(self, *attributes):
-        attr_list = []
-        for attr in attributes:
-            if isinstance(attr, str):
-                attr_list.append(attr)
-            elif isinstance(attr, Interface):
-                attr_list.extend(attr._attributes)
-            else:
-                raise TypeError('Expected str or Interface, got {attr}.')
-        self._attributes = tuple(attr_list)
+    def __instancecheck__(self, instance):
+        return all(
+            hasattr(instance, f) for f in dir(self) if isinstance(getattr(
+                self, f), Abstract))
 
-    def __call__(self, cls):
-        """Return a modified version of cls with missing attributes filled in
-        with Abstract descriptors.
-        """
-        return type(
-            cls.__name__, cls.__bases__,
-            dict(
-                {name: Abstract() for name in self._attributes},
-                **cls.__dict__))
-
-    def validate(self, o):
-        """Check if object o has all the attributes of the Interface.
-
-        If o's class was declared with this interface and it does not define all
-        required attributes, consider this a bug in the class, and throw
-        NotImplementedError.
-        """
-        return all(hasattr(o, attr) for attr in self._attributes)
+    @classmethod
+    def new(cls, name, *fields, bases=()):
+        return cls(name, bases, dict(
+            {'__slots__': ()}, **{f: Abstract() for f in fields}))

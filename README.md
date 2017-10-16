@@ -97,7 +97,8 @@ Interface objects have a method:
 Return True if *obj* has all of the attributes that would be required by this
 Interface, otherwise False. This lets you check undecorated classes. Note that
 if *obj*'s class was decorated with this Interface and does not fully implement
-it, this is a bug in the class. In that case, `validate` will raise NotImplementedError.
+it, this is a bug in the class. In that case, `validate` will raise
+NotImplementedError.
 
 ## Exceptions
 
