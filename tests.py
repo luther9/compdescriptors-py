@@ -67,6 +67,10 @@ class AbstractTest(unittest.TestCase):
             pass
         self.assertRaises(NotImplementedError, getattr, B(), 'var')
 
+    def test_class_get(self):
+        """When accessed by class, return the descriptor object."""
+        self.assertIsInstance(self.A.var, Abstract)
+
 
 class InterfaceTest(unittest.TestCase):
     """This fixture tests getting attributes from different kinds of classes."""

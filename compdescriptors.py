@@ -58,6 +58,8 @@ class Abstract:
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         name = self._name
         try:
             return instance.__getattr__(name)
