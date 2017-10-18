@@ -16,6 +16,8 @@ class Delegate:
         self.name = name
 
     def __get__(self, instance, _):
+        if instance is None:
+            return self
         return getattr(getattr(instance, self.field), self.name)
 
     def __set__(self, instance, value):

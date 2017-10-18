@@ -26,6 +26,7 @@ class DelegateTest(unittest.TestCase):
             def __init__(self):
                 self.thing = Thing()
 
+        self.C = C
         self.o = C()
 
     def test_delegate(self):
@@ -42,6 +43,10 @@ class DelegateTest(unittest.TestCase):
 
     def test_delegate_special(self):
         self.assertEqual(len(self.o), 42)
+
+    def test_class_get(self):
+        """When accessed by class, return the descriptor object."""
+        self.assertIsInstance(self.C.var, Delegate)
 
 
 class AbstractTest(unittest.TestCase):
