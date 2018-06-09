@@ -11,6 +11,8 @@ from compdescriptors import (
 
 class DelegateTest(unittest.TestCase):
   """Test the delegation function."""
+  # Allow other classes to use the same methods with a different delegator.
+  delegator = Delegate
 
   def setUp(self):
 
@@ -21,8 +23,8 @@ class DelegateTest(unittest.TestCase):
         return 42
 
     class C:
-      var = Delegate('thing')
-      __len__ = Delegate('thing')
+      var = self.delegator('thing')
+      __len__ = self.delegator('thing')
       def __init__(self):
         self.thing = Thing()
 
@@ -46,7 +48,7 @@ class DelegateTest(unittest.TestCase):
 
   def test_class_get(self):
     """When accessed by class, return the descriptor object."""
-    self.assertIsInstance(self.C.var, Delegate)
+    self.assertIsInstance(self.C.var, self.delegator)
 
 
 class AbstractTest(unittest.TestCase):
