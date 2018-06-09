@@ -1,6 +1,6 @@
-#!/usr/bin/python3.6
+#!/usr/bin/env python3
 
-# 2017 Luther Thompson
+# 2017-2018 Luther Thompson
 # This code is public domain under CC0. See the file COPYING for details.
 
 import unittest
