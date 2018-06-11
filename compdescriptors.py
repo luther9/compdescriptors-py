@@ -19,9 +19,10 @@ class Delegate:
     self.name = name
 
   def __get__(self, instance, _):
-    if instance is None:
-      return self
-    return getattr(getattr(instance, self.field), self.name)
+    return (
+      self if instance is None
+      else getattr(getattr(instance, self.field), self.name)
+    )
 
 
 # Inherit, even though Delegate is mutable, because this needs to do everything
