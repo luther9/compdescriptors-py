@@ -6,7 +6,8 @@
 import unittest
 
 from compdescriptors import (
-  Delegate, Abstract, Interface, final, InheritanceError)
+  Delegate, DelegateMutable, Abstract, Interface, final, InheritanceError,
+)
 
 
 class DelegateTest(unittest.TestCase):
@@ -28,11 +29,23 @@ class DelegateTest(unittest.TestCase):
       def __init__(self):
         self.thing = Thing()
 
-    self.C = C
-    self.o = C()
+    self.__dict__.update(C=C, o=C())
 
   def test_delegate(self):
     self.assertEqual(self.o.var, 'hello')
+
+  def test_delegate_special(self):
+    self.assertEqual(len(self.o), 42)
+
+  def test_class_get(self):
+    """When accessed by class, return the descriptor object."""
+    self.assertIsInstance(self.C.var, self.delegator)
+
+
+# Inherit to ensure we run all the same tests.
+class DelegateMutableTest(DelegateTest):
+  """Test the mutable delegator."""
+  delegator = DelegateMutable
 
   def test_delegate_set(self):
     self.o.var = 84
@@ -42,13 +55,6 @@ class DelegateTest(unittest.TestCase):
     del self.o.var
     self.assertFalse(hasattr(self.o, 'var'))
     self.assertFalse(hasattr(self.o.thing, 'var'))
-
-  def test_delegate_special(self):
-    self.assertEqual(len(self.o), 42)
-
-  def test_class_get(self):
-    """When accessed by class, return the descriptor object."""
-    self.assertIsInstance(self.C.var, self.delegator)
 
 
 class AbstractTest(unittest.TestCase):
@@ -72,6 +78,23 @@ class AbstractTest(unittest.TestCase):
   def test_class_get(self):
     """When accessed by class, return the descriptor object."""
     self.assertIsInstance(self.A.var, Abstract)
+
+  def testMultipleInheritance(self):
+    """Works if abstract class comes first in MRO."""
+    class B:
+      var = True
+    class Concrete(self.A, B):
+      pass
+    self.assertIs(Concrete().var, True)
+
+  def testMultipleAndGetattr(self):
+    """Finds attribute in __getattr__ with multiple inheritance."""
+    class B:
+      def __getattr__(self, name):
+        return True
+    class Concrete(self.A, B):
+      pass
+    self.assertIs(Concrete().var, True)
 
 
 class InterfaceTest(unittest.TestCase):
